@@ -15,26 +15,21 @@
  */
 package org.terasology.rendering.nui.layers.ingame.inventory;
 
-import org.terasology.utilities.Assets;
+import org.joml.Quaternionf;
+import org.joml.Vector2i;
+import org.joml.Vector3f;
 import org.terasology.math.TeraMath;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector2i;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureRegion;
-import org.terasology.rendering.nui.BaseInteractionListener;
-import org.terasology.rendering.nui.Canvas;
-import org.terasology.rendering.nui.CoreWidget;
-import org.terasology.rendering.nui.InteractionListener;
-import org.terasology.rendering.nui.LayoutConfig;
-import org.terasology.rendering.nui.UIWidget;
+import org.terasology.rendering.nui.*;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.skin.UISkin;
 import org.terasology.rendering.nui.widgets.TooltipLine;
 import org.terasology.rendering.nui.widgets.TooltipLineRenderer;
 import org.terasology.rendering.nui.widgets.UIList;
+import org.terasology.utilities.Assets;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -69,8 +64,8 @@ public class ItemIcon extends CoreWidget {
         if (getIcon() != null) {
             canvas.drawTexture(getIcon());
         } else if (getMesh() != null && getMeshTexture() != null) {
-            Quat4f rot = new Quat4f(TeraMath.PI / 6, -TeraMath.PI / 12, 0);
-            canvas.drawMesh(getMesh(), getMeshTexture(), canvas.getRegion(), rot, new Vector3f(), 1.0f);
+            Quaternionf rotation = new Quaternionf().rotateYXZ(TeraMath.PI / 6, -TeraMath.PI / 12, 0);
+            canvas.drawMesh(getMesh(), getMeshTexture(), canvas.getRegion(), rotation, new Vector3f(), 1.0f);
         }
         if (getQuantity() > 1) {
             canvas.drawText(Integer.toString(getQuantity()));

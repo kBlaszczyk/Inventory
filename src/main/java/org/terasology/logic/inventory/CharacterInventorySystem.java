@@ -16,6 +16,7 @@
 
 package org.terasology.logic.inventory;
 
+import org.joml.Vector3f;
 import org.terasology.logic.characters.events.PlayerDeathEvent;
 import org.terasology.physics.HitResult;
 import org.terasology.physics.Physics;
@@ -44,7 +45,6 @@ import org.terasology.logic.inventory.events.GiveItemEvent;
 import org.terasology.logic.inventory.events.InventorySlotChangedEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.LocalPlayer;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.network.NetworkSystem;
 import org.terasology.physics.events.ImpulseEvent;
 import org.terasology.registry.In;
@@ -184,22 +184,19 @@ public class CharacterInventorySystem extends BaseComponentSystem {
             Vector3f position = localPlayer.getViewPosition();
             Vector3f direction = localPlayer.getViewDirection();
 
-            Vector3f maxAllowedDistanceInDirection = direction.mul(1.5f);
             HitResult hitResult = physics.rayTrace(position, direction, 1.5f, StandardCollisionGroup.CHARACTER, StandardCollisionGroup.WORLD);
-            if (hitResult.isHit()) {
-                Vector3f possibleNewPosition = hitResult.getHitPoint();
-                maxAllowedDistanceInDirection = possibleNewPosition.sub(position);
-            }
+            Vector3f maxAllowedDistanceInDirection = new Vector3f();
+            if (hitResult.isHit())
+                maxAllowedDistanceInDirection.set(hitResult.getHitPoint()).sub(position);
+            else
+                maxAllowedDistanceInDirection.set(direction).mul(1.5f);
 
-            Vector3f newPosition = position;
-            newPosition.add(maxAllowedDistanceInDirection.mul(0.9f));
+            Vector3f newPosition = new Vector3f(position).add(maxAllowedDistanceInDirection.mul(0.9f));
 
             //send DropItemRequest
             Vector3f impulseVector = new Vector3f(direction);
-            impulseVector.scale(dropPower);
-            entity.send(new DropItemRequest(selectedItemEntity, entity,
-                    impulseVector,
-                    newPosition));
+            impulseVector.mul(dropPower);
+            entity.send(new DropItemRequest(selectedItemEntity, entity, impulseVector, newPosition));
 
             characterHeldItemComponent.lastItemUsedTime = time.getGameTimeInMs();
             entity.saveComponent(characterHeldItemComponent);

@@ -15,13 +15,13 @@
  */
 package org.terasology.rendering.nui.layers.hud;
 
+import org.joml.Vector3f;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.input.MouseInput;
 import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.inventory.InventoryUtils;
 import org.terasology.logic.inventory.events.DropItemRequest;
 import org.terasology.logic.players.LocalPlayer;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
@@ -54,17 +54,12 @@ public class DropItemRegion extends CoreHudWidget {
                 }
 
                 Vector3f position = localPlayer.getViewPosition();
-                Vector3f direction = localPlayer.getViewDirection();
-                Vector3f newPosition = new Vector3f(position.x + direction.x * 1.5f,
-                        position.y + direction.y * 1.5f,
-                        position.z + direction.z * 1.5f
-                );
-                //send DropItemRequest
-                Vector3f impulseVector = new Vector3f(direction);
-                playerEntity.send(new DropItemRequest(item, playerEntity,
-                        impulseVector,
-                        newPosition,
-                        count));
+                Vector3f extendedDirection = localPlayer.getViewDirection().mul(1.5f);
+                Vector3f newPosition = new Vector3f(position).add(extendedDirection);
+
+                playerEntity.send(new DropItemRequest(
+                        item, playerEntity, extendedDirection, newPosition, count
+                ));
                 return true;
             }
             return false;
